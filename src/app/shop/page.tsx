@@ -12,6 +12,7 @@ interface ShopListProps {
   shopPrice: string;
   shopDiscountPrice: string;
   shopPercentageNumber: string;
+  shopRatingNumber: string;
   id?: string;
 }
 
@@ -76,6 +77,17 @@ const ShopPage = () => {
                   className="mx-auto"
                 />
               </div>
+              <div className="flex justify-center my-3">
+                {Array(
+                  shop.shopRatingNumber ? parseInt(shop.shopRatingNumber) : 0
+                )
+                  .fill("")
+                  .map((_, index) => (
+                    <span key={index} className="text-orange-500 text-lg">
+                      ★
+                    </span>
+                  ))}
+              </div>
 
               {/* Product Name & Details */}
               <Link
@@ -89,22 +101,13 @@ const ShopPage = () => {
               </Link>
 
               {/* Star Ratings */}
-              <div className="flex justify-center my-2">
-                {Array(5)
-                  .fill("")
-                  .map((_, index) => (
-                    <span key={index} className="text-orange-500 text-lg">
-                      ★
-                    </span>
-                  ))}
-              </div>
 
               {/* Price Section */}
               <p className="text-gray-500 line-through text-sm">
-                Rs {shop.shopPrice}.00
+                Rs {shop.shopDiscountPrice}.00
               </p>
               <p className="text-black font-bold text-lg">
-                Rs {shop.shopDiscountPrice}.00
+                Rs {shop.shopPrice}.00
               </p>
 
               {/* Shop Now Button */}

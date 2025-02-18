@@ -11,6 +11,8 @@ interface KidListProps {
   kidsCatalogTitle: string;
   kidsCatalogImage?: { url: string };
   kidsCatalogPrice: string;
+  kidsDiscountPrice: string;
+  kidsRatingNumber: string;
   id?: string;
 }
 
@@ -46,14 +48,40 @@ const KidCard = ({ kid }: { kid: KidListProps }) => {
 
         {/* Product Details */}
         <div className="p-4 space-y-1 text-center">
-          <h2 className="text-xs md:text-sm font-semibold text-gray-700 group-hover:text-[#8ab8bd] transition-colors">
-            <span className="text-black">Name: </span>
+          {/* Star Ratings */}
+          <div className="flex justify-center">
+            {Array(kid.kidsRatingNumber ? parseInt(kid.kidsRatingNumber) : 0)
+              .fill("")
+              .map((_, index) => (
+                <span key={index} className="text-orange-500 text-lg">
+                  ★
+                </span>
+              ))}
+          </div>
+
+          {/* Product Title */}
+          <h2 className="text-md font-semibold text-[#8ab8bd] hover:text-black cursor-pointer transition-colors">
             {kid.kidsCatalogTitle || "Untitled Item"}
           </h2>
-          <p className="text-xs md:text-sm font-semibold text-gray-600 group-hover:text-black transition-colors">
-            <span className="text-black">Price: </span>
-            {kid.kidsCatalogPrice || "Price not available"}
-          </p>
+
+          {/* Product Pricing */}
+          <div className="text-xs md:text-sm font-semibold text-gray-600 group-hover:text-black transition-colors">
+            <p className="text-gray-500 line-through text-[12px]">
+              Rs{" "}
+              {kid.kidsDiscountPrice
+                ? `${kid.kidsDiscountPrice}.00`
+                : "Price not available"}
+            </p>
+            <p className="text-black font-bold text-[17px] underline">
+              Rs{" "}
+              {kid.kidsCatalogPrice
+                ? `${kid.kidsCatalogPrice}.00`
+                : "Price not available"}
+            </p>
+          </div>
+          <div className="text-black text-sm font-bold hover:underline">
+            SHOP NOW
+          </div>
         </div>
       </div>
     </Link>
@@ -88,7 +116,9 @@ const KidList = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-8">Kid&lsquo;s Collection</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">
+        Kid&lsquo;s Collection
+      </h1>
       {loading ? (
         <p className="text-center text-gray-500 animate-pulse">Loading...</p>
       ) : kidList.length === 0 ? (

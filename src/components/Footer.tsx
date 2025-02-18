@@ -42,7 +42,7 @@ const Footer = () => {
               <li key={index}>
                 <Link
                   href={item.link}
-                  className="hover:text-orange-600 transition"
+                  className="hover:text-[#8ab8bd] transition"
                 >
                   {item.name}
                 </Link>

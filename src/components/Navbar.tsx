@@ -102,7 +102,7 @@ const Navbar = () => {
             HOME
           </Link>
           <CategoriesDropdown />
-          <a href="#about" className="hover:text-black transition">
+          <a href="/about" className="hover:text-black transition">
             ABOUT
           </a>
           {/* <Link href="/about" className="hover:text-black transition">

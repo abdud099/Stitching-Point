@@ -1,27 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { getMen } from "@/Services"; // Fetch API (Mock or Real)
 import { FaFacebookF, FaTwitter, FaPinterestP } from "react-icons/fa";
 
 interface MenListProps {
-  id: string | string[] | undefined;
   mensCatalogTitle: string;
   mensCatalogImage?: { url: string };
   mensCatalogPrice: string;
+  mensDiscountPrice: string;
+  mensRatingNumber: string;
   mensCatalogDescription?: string;
+  inStock: boolean;
+  id: string | string[] | undefined;
 }
 
 const ProductDetail = () => {
   const { id } = useParams(); // Get product ID from URL
   const [product, setProduct] = useState<MenListProps | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedColor, setSelectedColor] = useState("Navy/White Trim");
+  const [result, setResult] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
   const [quantity, setQuantity] = useState(1);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
+
+  // User Contact Details
+  const [name, setName] = useState("");
+  const [size, setSize] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
 
   useEffect(() => {
     if (id) fetchMenList();
@@ -48,6 +59,46 @@ const ProductDetail = () => {
     }
   };
 
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setResult("Sending...");
+
+    const formData = new FormData(event.currentTarget);
+    formData.append("access_key", "402cbe14-50a8-4a43-9f5e-a743f7d545cd");
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setResult(
+          "✅ Delivery within 3-5 days. Express delivery options available for urgent orders."
+        );
+
+        // Reset all input fields
+        setTimeout(() => {
+          setName("");
+          setEmail("");
+          setPhone("");
+          setSize("");
+          setAddress("");
+          setQuantity(1);
+          setResult(""); // Clear message after reset
+          formRef.current?.reset();
+        }, 2000);
+      } else {
+        setResult(`❌ Error: ${data.message}`);
+      }
+    } catch (error) {
+      setResult("❌ Error submitting the form.");
+      console.error("Form submission error:", error);
+    }
+  };
+
   if (loading) return <p className="text-center mt-10">Loading...</p>;
   if (!product) return <p className="text-center mt-10">Product not found.</p>;
 
@@ -71,64 +122,179 @@ const ProductDetail = () => {
 
       {/* Product Details */}
       <div>
-        <h1 className="text-3xl font-mono text-gray-600">
-          {product.mensCatalogTitle}
+        <h1 className="text-3xl font-semibold text-gray-600">
+          {product.mensCatalogTitle || "Product Name Not Available"}
         </h1>
+
+        {/* Star Ratings & Reviews */}
         <div className="flex items-center mt-2">
-          <span className="text-yellow-500">⭐⭐⭐⭐✩</span>
-          <p className="ml-2 text-gray-500">(reviews)</p>
+          {Array(
+            product.mensRatingNumber ? parseInt(product.mensRatingNumber) : 0
+          )
+            .fill("")
+            .map((_, index) => (
+              <span key={index} className="text-orange-500 text-lg">
+                ★
+              </span>
+            ))}
+          <p className="ml-2 text-gray-500">
+            {product.mensRatingNumber}.0 Reviews
+          </p>
         </div>
-        <p className="text-2xl font-mono text-gray-700 mt-2">
-          ${product.mensCatalogPrice}
-        </p>
+
+        {/* Product Price Section */}
+        <div className="mt-2 flex items-center justify-between">
+          {/* Pricing Section */}
+          <div>
+            <p className="text-gray-500 line-through text-sm">
+              RS{" "}
+              {product.mensDiscountPrice
+                ? `${product.mensDiscountPrice}.00`
+                : "N/A"}
+            </p>
+            <p className="text-2xl font-semibold text-gray-700">
+              RS{" "}
+              {product.mensCatalogPrice
+                ? `${product.mensCatalogPrice}.00`
+                : "Price not available"}
+            </p>
+          </div>
+
+          {/* Stock Status */}
+          <p
+            className={`text-sm font-semibold ${
+              product.inStock ? "text-green-500" : "text-red-500"
+            }`}
+          >
+            {product.inStock ? "In stock" : "Out of stock"}
+          </p>
+        </div>
+
+        {/* Afterpay Installment Calculation */}
         <p className="text-sm text-gray-500 mt-2">
-          or 4 interest-free payments of $
+          or 4 interest-free payments of RS{" "}
           {product.mensCatalogPrice
             ? (parseFloat(product.mensCatalogPrice) / 4).toFixed(2)
             : "N/A"}{" "}
           with Afterpay
         </p>
 
-        {/* Size & Color Selection */}
-        <div className="mt-6">
-          <label className="block font-semibold">Size</label>
-          <select className="border p-2 w-full mt-1 rounded">
-            <option>Select Size</option>
-            <option>Small</option>
-            <option>Medium</option>
-            <option>Large</option>
-          </select>
-        </div>
+        <ul className=" text-gray-700 mt-4">
+          {product.mensCatalogDescription || "Product Description Not Available"}
+        </ul>
 
-        <div className="mt-4">
-          <label className="block font-semibold">Color</label>
-          <select
-            value={selectedColor}
-            onChange={(e) => setSelectedColor(e.target.value)}
-            className="border p-2 w-full mt-1 rounded"
-          >
-            <option>Navy/White Trim</option>
-            <option>Red/White Trim</option>
-            <option>Black</option>
-          </select>
-        </div>
-
-        {/* Quantity Selector */}
-        <div className="mt-4">
-          <label className="block font-semibold">Quantity</label>
+        <form ref={formRef} onSubmit={onSubmit} className="space-y-4 mt-4">
+          {/* Hidden Fields for Product Details */}
+          <input type="hidden" name="product_id" value={product.id} />
           <input
-            type="number"
-            value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-            className="border p-2 w-full mt-1 rounded"
-            min="1"
+            type="hidden"
+            name="product Title"
+            value={product.mensCatalogTitle}
           />
-        </div>
+          <input
+            type="hidden"
+            name="product Price"
+            value={product.mensCatalogPrice}
+          />
+          <input
+            type="hidden"
+            name="product Image"
+            value={product.mensCatalogImage?.url || ""}
+          />
 
-        {/* Add to Cart Button */}
-        <button className="mt-6 bg-pink-500 text-white w-full p-3 rounded-md font-bold hover:bg-pink-600">
-          ADD TO CART
-        </button>
+          {/* Full Name */}
+          <div>
+            <label className="block font-semibold">Full Name</label>
+            <input
+              type="text"
+              name="user Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your full name"
+              className="border p-2 w-full rounded"
+              required
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block font-semibold">Email</label>
+            <input
+              type="email"
+              name="user Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="border p-2 w-full rounded"
+              required
+            />
+          </div>
+
+          {/* Phone Number */}
+          <div>
+            <label className="block font-semibold">Phone Number</label>
+            <input
+              type="tel"
+              name="user Phone Number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Enter your phone number"
+              className="border p-2 w-full rounded"
+              required
+            />
+          </div>
+
+          {/* Size Selection */}
+          <div>
+            <label className="block font-semibold">Size</label>
+            <input
+              type="text"
+              name="User Clothe Size"
+              value={size}
+              onChange={(e) => setSize(e.target.value)}
+              placeholder="Size (S, M, L, XL)"
+              className="border p-2 w-full rounded"
+              required
+            />
+          </div>
+
+          {/* Address */}
+          <div>
+            <label className="block font-semibold">Full Address</label>
+            <textarea
+              name="userAddress"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter your delivery address"
+              className="border p-2 w-full rounded"
+              rows={2}
+              required
+            />
+          </div>
+
+          {/* Quantity */}
+          <div>
+            <label className="block font-semibold">Quantity</label>
+            <input
+              type="number"
+              name="quantity"
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+              className="border p-2 w-full rounded"
+              min="1"
+              required
+            />
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-pink-500 text-white p-3 rounded-md font-bold hover:bg-pink-600"
+          >
+            SUBMIT ORDER
+          </button>
+          <p className="text-center text-sm text-gray-600 mt-2">{result}</p>
+        </form>
 
         {/* Expandable Sections */}
         {["Details", "Shipping", "Size Guide"].map((section) => (
@@ -143,19 +309,24 @@ const ProductDetail = () => {
               <div className="p-3 text-gray-600">
                 {section === "Details" && (
                   <ul>
-                    <li>✅ Shirred back with zipper</li>
-                    <li>✅ Tiered Midi Length</li>
-                    <li>✅ Adjustable fit with inner buttons</li>
+                    <li>✅ Premium stitching with expert craftsmanship</li>
+                    <li>✅ High-quality fabric for durability and comfort</li>
+                    <li>✅ Customizable fitting for a perfect tailored look</li>
                   </ul>
                 )}
                 {section === "Shipping" && (
                   <p>
-                    📦 Free shipping on orders over $50. Standard delivery: 3-5
-                    business days.
+                    📦 Free shipping on orders over <strong>500 PKR</strong>.
+                    Standard delivery within <strong>3-5 business days</strong>.
+                    Express delivery options available for urgent orders.
                   </p>
                 )}
                 {section === "Size Guide" && (
-                  <p>📏 Use our size guide to find the perfect fit.</p>
+                  <p>
+                    📏 Use our **custom size guide** to ensure a perfect fit.
+                    Need help? Contact us for **personalized stitching
+                    recommendations**.
+                  </p>
                 )}
               </div>
             )}

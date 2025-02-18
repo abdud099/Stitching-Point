@@ -7,19 +7,19 @@ export const getMen = async () => {
   const query = gql`
     query MyQuery {
       mensCatalogs {
-        createdAt
-        id
         mensCatalogDescription
         mensCatalogLocation
         mensCatalogNumber
+        mensDiscountPrice
+        mensRatingNumber
         mensCatalogPrice
         mensCatalogTitle
         mensCatalogUpload
-        publishedAt
-        updatedAt
+        inStock
         mensCatalogImage {
           url
         }
+        id
       }
     }
   `;
@@ -31,19 +31,19 @@ export const getFemale = async () => {
   const query = gql`
     query MyQuery {
       femalesCatalogs {
-        createdAt
         femalesCatalogDescription
         femalesCatalogLocation
+        femalesDiscountPrice
+        femalesRatingNumber
         femalesCatalogNumber
         femalesCatalogPrice
         femalesCatalogTitle
+        inStock
         femalesCatalogUploadDate
-        id
-        publishedAt
-        updatedAt
         femalesCatalogImage {
           url
         }
+        id
       }
     }
   `;
@@ -55,19 +55,19 @@ export const getKid = async () => {
   const query = gql`
     query MyQuery {
       kidsCatalogs {
-        createdAt
-        id
         kidsCatalogDescription
         kidsCatalogLocation
         kidsCatalogNumber
+        kidsDiscountPrice
+        kidsRatingNumber
         kidsCatalogPrice
         kidsCatalogTitle
+        inStock
         kidsCatalogUploadDate
-        publishedAt
-        updatedAt
         kidsCatalogImage {
           url
         }
+        id
       }
     }
   `;
@@ -82,16 +82,16 @@ export const getBrand = async () => {
         brandsDescription
         brandsLocation
         brandsNumber
+        brandsDiscountPrice
+        brandsRatingNumber
         brandsPrice
         brandsTitle
         brandsUpload
-        createdAt
-        id
-        publishedAt
-        updatedAt
+        inStock
         brandsImage {
           url
         }
+        id
       }
     }
   `;
@@ -105,14 +105,12 @@ export const getBlog = async () => {
       blogs {
         blogDescription
         blogTitle
-        createdAt
-        id
-        updatedAt
         blogContent
         blogUploadDate
         blogImage {
           url
         }
+        id
       }
     }
   `;
@@ -124,19 +122,17 @@ export const getShop = async () => {
   const query = gql`
     query MyQuery {
       shops {
-        createdAt
-        id
-        inStock
-        publishedAt
         shopDescription
         shopDiscountPrice
+        shopRatingNumber
         shopPrice
         shopTitle
-        updatedAt
+        inStock
         shopPercentageNumber
         shopImage {
           url
         }
+        id
       }
     }
   `;
